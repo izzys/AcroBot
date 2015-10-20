@@ -12,7 +12,7 @@ Sim.Con.Controller_Type = 'off';
 Sim.Con.Init();
 
 % Simulate:
-Sim.Mod.IC = [ pi+0.01; 0 ; 0 ; 0];
+Sim.Mod.IC = [ -pi/2; 0 ;0 ; 0];
 Sim = Sim.Init();
 Sim = Sim.Run();
 plot_out(Sim);

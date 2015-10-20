@@ -22,7 +22,7 @@ function [] = Render(sim,t,X,flag)
                 set(gca,'LooseInset',get(gca,'TightInset')*2)
                 cla % clear previous render
                 axis equal
-                %axis([-1 1 -1.5 0.5])
+                axis(1.1*[-2 2 -2 2])
        
                 % Initialize display timer
                 sim.hTime = uicontrol('Style', 'text',...
