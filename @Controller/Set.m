@@ -20,24 +20,7 @@ else
                 Con.Gain = value; 
             case 'Pulse_Width'
                 Con.Pulse_Width = value; 
-            case 'gamma'
-                Con.gamma = value; 
-            case 'mu'
-                Con.mu = value; 
-            case 'NumOfNeurons'
-                Con.NumOfNeurons = value; 
-            case'epsilon'
-                Con.epsilon = value; 
-            case 'tau'
-                Con.tau = value; 
-            case 'eta'
-                Con.eta = value; 
-            case 'Amp_teach'
-                Con.Amp_teach = value; 
-            case 'Omega_teach'
-                Con.Omega_teach = value;
-            case 'Phi_teach'
-                Con.Phi_teach = value; 
+
             otherwise
                 error(['Set failed: ',key,' property not found']);
         end
