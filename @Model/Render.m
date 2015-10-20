@@ -1,26 +1,29 @@
 % Render model:
 function Mod = Render(Mod,X)
 
-    [x1,y1] = Mod.GetPos(X,'m');
-
+    [x1,y1] = Mod.GetPos(X,'end1');
+    [x2,y2] = Mod.GetPos(X,'end2');
+    
     if isempty(Mod.RenderObj) % Model hasn't been rendered yet
 
-
-        % Render mass as circle
-        Mod.RenderObj.m = DrawCircle(Mod, x1, y1, 1, Mod.m_radius, Mod.m_color, []);
-
+        % Render joints as circle
+        Mod.RenderObj.j1 = DrawCircle(Mod, Mod.x0, Mod.y0, 1, Mod.joint_radius, Mod.joint_color, []);
+        Mod.RenderObj.j2 = DrawCircle(Mod, x1, y1, 1, Mod.joint_radius, Mod.joint_color, []);
+        
         % Render links
-        Mod.RenderObj.L = DrawLink(Mod, Mod.x0, Mod.y0, x1, y1, 0, []);
-       
+        Mod.RenderObj.L1 = DrawLink(Mod, Mod.x0, Mod.y0, x1, y1, 0, []);
+        Mod.RenderObj.L2 = DrawLink(Mod, x1, y1, x2, y2, 0, []);
         
         % Finished rendering
         % Call function again to proceed with the code below
         Mod = Render(Mod,X);
+        
     else
         
         % Model was already rendered - Re-draw links
-        DrawCircle(Mod, x1, y1, 1, Mod.m_radius, Mod.m_color,Mod.RenderObj.m);
-        DrawLink(Mod, Mod.x0, Mod.y0, x1, y1,0,Mod.RenderObj.L);
+        DrawCircle(Mod, x1, y1, 1, Mod.joint_radius, Mod.joint_color,Mod.RenderObj.j2);
+        DrawLink(Mod, Mod.x0, Mod.y0, x1, y1,0,Mod.RenderObj.L1);
+        DrawLink(Mod, x1, y1, x2, y2,0,Mod.RenderObj.L2);
 
     end
 
@@ -80,23 +83,23 @@ function Mod = Render(Mod,X)
             coordZ=zeros(1,2*Mod.LinkRes+1);
 
             x=0;
-            y = Length/2-Mod.leg_width/2;
+            y = Length/2-Mod.link_width/2;
             
             for r=1:Mod.LinkRes
-                coordX(1,r)=x+Mod.leg_width/2*cos(r/Mod.LinkRes*pi);
-                coordY(1,r)=y+Mod.leg_width/2*sin(r/Mod.LinkRes*pi);
+                coordX(1,r)=x+Mod.link_width/2*cos(r/Mod.LinkRes*pi);
+                coordY(1,r)=y+Mod.link_width/2*sin(r/Mod.LinkRes*pi);
                 coordZ(1,r)=0;
             end
 
-            y = -Length/2+Mod.leg_width/2;
+            y = -Length/2+Mod.link_width/2;
             
             for r=Mod.LinkRes:2*Mod.LinkRes
-                coordX(1,r+1)=x+Mod.leg_width/2*cos(r/Mod.LinkRes*pi);
-                coordY(1,r+1)=y+Mod.leg_width/2*sin(r/Mod.LinkRes*pi);
+                coordX(1,r+1)=x+Mod.link_width/2*cos(r/Mod.LinkRes*pi);
+                coordY(1,r+1)=y+Mod.link_width/2*sin(r/Mod.LinkRes*pi);
                 coordZ(1,r+1)=0;
             end
 
-            res.Geom=patch(coordX,coordY,coordZ,Mod.leg_color);
+            res.Geom=patch(coordX,coordY,coordZ,Mod.link_color);
             set(res.Geom,'EdgeColor',[0 0 0]);
             set(res.Geom,'LineWidth',2*Mod.LineWidth);
 
@@ -110,7 +113,7 @@ function Mod = Render(Mod,X)
 
             Txy=makehgtform('translate',[Center(1) Center(2) z]);
             Rz=makehgtform('zrotate',Orientation-pi/2);
-            Sx=makehgtform('scale',[Length/Mod.L,1,1]);
+            Sx=makehgtform('scale',[Length/Mod.l1,1,1]);
             set(Obj.Trans,'Matrix',Txy*Rz*Sx);
             res=1;
         end

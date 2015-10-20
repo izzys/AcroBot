@@ -41,10 +41,10 @@ function [ sim ] = Init( sim )
         end
         
         % Init world size params
-        sim.FlMin = sim.COMx0-1.25*sim.AR*sim.Mod.L;
-        sim.FlMax = sim.COMx0+1.25*sim.AR*sim.Mod.L;
-        sim.HeightMin = sim.COMy0-1/sim.AR*sim.Mod.L;
-        sim.HeightMax = sim.COMy0+4/sim.AR*sim.Mod.L;
+        sim.FlMin = sim.COMx0-1.25*sim.AR*sim.Mod.l1;
+        sim.FlMax = sim.COMx0+1.25*sim.AR*sim.Mod.l1;
+        sim.HeightMin = sim.COMy0-6/sim.AR*sim.Mod.l1;
+        sim.HeightMax = sim.COMy0+4/sim.AR*sim.Mod.l1;
 
     end
     

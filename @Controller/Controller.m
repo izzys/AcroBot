@@ -31,10 +31,10 @@ classdef Controller < handle & matlab.mixin.Copyable
             
           switch NC.Controller_Type
               
-              case 'pulse'
+              case 'off'
                   
-                NC.stDim = 1; 
-                NC.nEvents = 1;
+                NC.stDim = 0; 
+                NC.nEvents = 0;
                                 
               otherwise
                   
@@ -47,9 +47,9 @@ classdef Controller < handle & matlab.mixin.Copyable
             
            switch NC.Controller_Type
               
-              case 'pulse'
+              case 'off'
                   
-                  Xdot = NC.omega0;
+                  Xdot = [];
                                
               otherwise
                   
@@ -66,12 +66,9 @@ classdef Controller < handle & matlab.mixin.Copyable
             
             switch NC.Controller_Type
                    
-               case 'pulse'
+               case 'off'
                    
-                   value = 2*pi-X;
-                   isterminal = 1;
-                   direction = -1;
-                   
+                % do nothing  
              
                otherwise
                   
@@ -126,9 +123,7 @@ classdef Controller < handle & matlab.mixin.Copyable
                case 'off' 
                   
                    T = 0;      
-                   
-        
-              
+
                case 'pulse'
  
                otherwise

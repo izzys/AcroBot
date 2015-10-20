@@ -2,17 +2,17 @@ clc;clear all;close all;clear classes;
 set(0,'DefaultFigureWindowStyle','normal')
 
 Sim = Simulation();
-Sim.Graphics = 1;
+Sim.Graphics = 0;
 %1: number of steps, 2: covergance
-Sim.EndCond = 2;
-Sim = Sim.SetTime(0,0.01,100);
+Sim.EndCond = [1,2];%[1;124];%[1;40];
+Sim = Sim.SetTime(0,0.05,1200);
 
 % Init controller:
 Sim.Con.Controller_Type = 'off';
 Sim.Con.Init();
 
 % Simulate:
-Sim.Mod.IC = [ pi+0.01; 0 ; 0 ; 0];
+Sim.Mod.IC = [-0.2 ; 0 ; 0 ; 0];
 Sim = Sim.Init();
 Sim = Sim.Run();
-plot_out(Sim);
+plot_out;
