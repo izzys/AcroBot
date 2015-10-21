@@ -24,7 +24,6 @@ function [ sim ] = Run( sim )
 
     while TimeCond && sim.StopSim == 0
 
-        StepDone = 0;
         Xa = XTemp(end,:);
         for ev = 1:length(IE)
             
@@ -38,8 +37,7 @@ function [ sim ] = Run( sim )
                 % Call controller for model events:
                 [sim.Con,Xa(sim.ConCo)] =  ...
                     sim.Con.HandleExtEvent(ModEvID, XTemp(end,:),TTemp(end));
-                
-                StepDone = 1; % model event is called when pendulum reaches -0.1 rad, this is the poincare section.
+ 
             end
 
             % Is it a controller event?
@@ -54,17 +52,6 @@ function [ sim ] = Run( sim )
         end
        
         sim.IC = Xa;
-        
-        if StepDone
-            sim.ICstore(:,2:end) = sim.ICstore(:,1:end-1);
-            sim.ICstore(:,1) = sim.IC';
-            sim.StepsTaken = sim.StepsTaken+1;
-            if ~sim.Graphics
-            disp(['steps: ' num2str(sim.StepsTaken)])
-            end
-            sim = sim.CheckConvergence();
-            sim.Out.PoincareSection(:,sim.StepsTaken) = sim.IC';
-        end
         
         if sim.StopSim
             break;

@@ -11,10 +11,16 @@ classdef Controller < handle & matlab.mixin.Copyable
         Controller_Type; 
         
         % HC (Heuristic control) parameters:
-        alpha = pi/2;
-        Kp = 10;
+        alpha = pi/6;
+        Kp = 1;
         Kd = 0;
         
+        % Pulse parameters:
+        omega0;
+        Phase = 0;
+        Gain = 1;
+        Period;
+        Pulse_Width;
 
     end
     
@@ -124,7 +130,7 @@ classdef Controller < handle & matlab.mixin.Copyable
             
         end
         
-        function [T] = Get_Torque(Con,X,Mod,t)
+        function [T] = Get_Torque(Con,X,t)
             
            switch Con.Controller_Type
                
@@ -141,11 +147,9 @@ classdef Controller < handle & matlab.mixin.Copyable
                    e = (q2 - q2_desired);
                    de = dq2;
                    
-                   [x,y] = Mod.GetPos(X,'COM');
+                   HeightFacror = 
                    
-                   HeightFactor =1;
-                   
-                   T = -Con.Kp*e/HeightFactor-Con.Kd*de;
+                   T = -Con.Kp*e/HeightFacror-Con.Kd*de;
  
                otherwise
                   

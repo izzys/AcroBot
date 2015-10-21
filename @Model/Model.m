@@ -3,7 +3,7 @@ classdef Model < handle & matlab.mixin.Copyable
     properties
         
         stDim = 4; % state dimension
-        nEvents = 1; % num. of simulation events
+        nEvents = 2; % num. of simulation events
         IC;
         
         % System parameters:
@@ -52,7 +52,7 @@ classdef Model < handle & matlab.mixin.Copyable
         
         %  Get position:
         function [ x, y ] = GetPos(Mod, q, which)
-            
+                       
             theta1 = q(1);
             theta2 = q(3);
             
@@ -200,6 +200,13 @@ classdef Model < handle & matlab.mixin.Copyable
             isterminal(1) = 1;
             direction(1) = -1;
             
+            % Event #2 - dq1 = 0:
+            dq1 = q(2);
+                    
+            value(2) = dq1;
+            isterminal(2) = 1;
+            direction(2) =  0;
+            
             
         end
         
@@ -212,7 +219,10 @@ classdef Model < handle & matlab.mixin.Copyable
             switch evID
                 
                 case 1
-                  
+                    %do nothing
+                    
+                case 2
+                   % do nothing
                 otherwise
                     
                    return;

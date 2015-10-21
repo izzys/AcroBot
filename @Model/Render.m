@@ -14,6 +14,9 @@ function Mod = Render(Mod,X)
         Mod.RenderObj.L1 = DrawLink(Mod, Mod.x0, Mod.y0, x1, y1, 0, []);
         Mod.RenderObj.L2 = DrawLink(Mod, x1, y1, x2, y2, 0, []);
         
+        % Draw goal line:
+        Mod.RenderObj.Goal = line( [-1, 1], [Mod.l1, Mod.l1], [0  0],'Color','k','LineStyle','--');
+        
         % Finished rendering
         % Call function again to proceed with the code below
         Mod = Render(Mod,X);

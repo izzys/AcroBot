@@ -156,7 +156,7 @@ classdef Simulation < handle & matlab.mixin.Copyable
                case 'init'
                   
                   % get controler action - first time:
-                  sim.Mod.Torque = sim.Con.Get_Torque(sim.IC,t(1)); 
+                  sim.Mod.Torque = sim.Con.Get_Torque(sim.IC,sim.Mod,t(1)); 
                   
                   % save for out:
                   sim.Out.Torque = [sim.Out.Torque ; sim.Mod.Torque];
@@ -170,7 +170,7 @@ classdef Simulation < handle & matlab.mixin.Copyable
                otherwise
                    
                   % get controler action:
-                  sim.Mod.Torque = sim.Con.Get_Torque(X(:,end),t(end));
+                  sim.Mod.Torque = sim.Con.Get_Torque(X(:,end),sim.Mod,t(end));
                   
                   % save for out:
                   sim.Out.Torque = [sim.Out.Torque ; sim.Mod.Torque];
