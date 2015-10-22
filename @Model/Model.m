@@ -56,7 +56,7 @@ classdef Model < handle & matlab.mixin.Copyable
             theta1 = q(1);
             theta2 = q(3);
             
-             if strcmp(which,'end1')
+            if strcmp(which,'end1')
                 x = Mod.l1*sin(theta1);
                 y = -Mod.l1*cos(theta1);
                 return;
@@ -146,6 +146,53 @@ classdef Model < handle & matlab.mixin.Copyable
             end
         end
         
+        % Get energy:
+        function [ E ] = GetNrg(Mod, q, which)
+            
+            q1 =  q(1);
+            q2  = q(3);
+            dq1 = q(2);
+            dq2 = q(4);
+                
+            m1 = Mod.m1;
+            m2 = Mod.m2;
+            l1 = Mod.l1;
+            l2 = Mod.l2;
+            lc1 = Mod.lc1;
+            lc2 = Mod.lc2;
+            I1 = Mod.I1;
+            I2 = Mod.I2;
+            g = Mod.g;
+                
+            if strcmp(which,'kinetic')
+                
+                d11 = m2*lc1^2+m2*(l1^2+lc2^2+2*l1*lc2*cos(q2)+I1+I2);
+                d22 = m2*lc2^2+I2;
+                d12 = m2*(lc2^2+l1*lc2*cos(q2))+I2;
+                
+                E = 0.5*d11*dq1^2+d12*dq1*dq2+0.5*d22*dq2^2;
+            end
+            
+            if strcmp(which,'potential')              
+
+                [~,yc1] = Mod.GetPos(q,'center1');
+                [~,yc2] = Mod.GetPos(q,'center2');
+                
+              
+                E = m1*g*yc1+m2*g*yc2;
+            end
+            
+            
+            if strcmp(which,'total')
+                
+                Ek = Mod.GetNrg(q, 'kinetic');
+                Ep = Mod.GetNrg(q, 'potential');
+                
+                E = Ek+Ep;
+                
+            end
+                        
+        end
             
         % Derivative:
         function [qdot] = Derivative(Mod, t, q) %#ok<INUSL>
@@ -173,7 +220,7 @@ classdef Model < handle & matlab.mixin.Copyable
             
             tau = Mod.Torque;
             
-            ddtheta2 = (m2*lc2+I2-d2^2/d1)^(-1)*(tau+d2/d1*f1-m2*l1*lc2*dtheta1^2*sin(theta2)-f2);
+            ddtheta2 = (m2*lc2^2+I2-d2^2/d1)^(-1)*(tau+d2/d1*f1-m2*l1*lc2*dtheta1^2*sin(theta2)-f2);
             ddtheta1 = -d1^(-1)*(d2*ddtheta2+f1);
             
             qdot(1) =  q(2);
@@ -198,7 +245,7 @@ classdef Model < handle & matlab.mixin.Copyable
             
             value(1) = y-Mod.GoalHeight;
             isterminal(1) = 1;
-            direction(1) = -1;
+            direction(1) = 0;
             
             % Event #2 - dq1 = 0:
             dq1 = q(2);
@@ -219,7 +266,7 @@ classdef Model < handle & matlab.mixin.Copyable
             switch evID
                 
                 case 1
-                    %do nothing
+                    % do nothing
                     
                 case 2
                    % do nothing

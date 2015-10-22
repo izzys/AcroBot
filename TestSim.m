@@ -1,11 +1,11 @@
-clc;%clear all;close all;clear classes;
+clc;clear all;close all;clear classes;
 set(0,'DefaultFigureWindowStyle','normal')
 
 Sim = Simulation();
 Sim.Graphics = 1;
 %1: number of steps, 2: covergance
 Sim.EndCond = 2;
-Sim = Sim.SetTime(0,0.02,100);
+Sim = Sim.SetTime(0,0.005,100);
 
 % Init controller:
 Sim.Con.Controller_Type = 'HC';

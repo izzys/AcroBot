@@ -1,28 +1,28 @@
-function [ sim ] = Init( sim )
+function [ Sim ] = Init( Sim )
 % Initialize simulation properties
     % Set states
-    sim.stDim = sim.Mod.stDim + sim.Con.stDim; % state dimension
-    sim.ModCo = 1:sim.Mod.stDim; % Model coord. indices
-    sim.ConCo = sim.Mod.stDim+1:sim.stDim; % Contr. coord. indices
+    Sim.stDim = Sim.Mod.stDim + Sim.Con.stDim; % state dimension
+    Sim.ModCo = 1:Sim.Mod.stDim; % Model coord. indices
+    Sim.ConCo = Sim.Mod.stDim+1:Sim.stDim; % Contr. coord. indices
 
     % Set events
-    sim.nEvents = sim.Mod.nEvents + sim.Con.nEvents;
-    sim.ModEv = 1:sim.Mod.nEvents; % Model events indices
-    sim.ConEv = sim.Mod.nEvents+1:sim.nEvents; % Contr. events indices
+    Sim.nEvents = Sim.Mod.nEvents + Sim.Con.nEvents;
+    Sim.ModEv = 1:Sim.Mod.nEvents; % Model events indices
+    Sim.ConEv = Sim.Mod.nEvents+1:Sim.nEvents; % Contr. events indices
     
-    %set sim IC:
+    %set Sim IC:
     
-    if strcmp(sim.Con.Controller_Type,'Hopf_adaptive') && sim.Con.NumOfNeurons>1
-        sim.Con.IC = repmat(sim.Con.IC,sim.Con.NumOfNeurons,1);
+    if strcmp(Sim.Con.Controller_Type,'Hopf_adaptive') && Sim.Con.NumOfNeurons>1
+        Sim.Con.IC = repmat(Sim.Con.IC,Sim.Con.NumOfNeurons,1);
     end
     
-    sim.IC = [sim.Mod.IC ; sim.Con.IC];
-    sim.StopSim = 0;
+    Sim.IC = [Sim.Mod.IC ; Sim.Con.IC];
+    Sim.StopSim = 0;
         
     % Set render params
-    if sim.Graphics == 1
-        if sim.Fig == 0
-            sim.Once = 1;
+    if Sim.Graphics == 1
+        if Sim.Fig == 0
+            Sim.Once = 1;
         end
         
         % Init window size params
@@ -31,40 +31,46 @@ function [ sim ] = Init( sim )
             % If 2 screens are used in Linux
             scrsz(3) = scrsz(3)/2;
         end
-        sim.FigWidth = scrsz(3)-500;
-        sim.FigHeight = scrsz(4)-350;
-        sim.AR = sim.FigWidth/sim.FigHeight;
-        if isempty(sim.IC)
-            [sim.COMx0,sim.COMy0] = sim.Mod.GetPos(zeros(1,sim.Mod.stDim),'COM');
+        Sim.FigWidth = scrsz(3)-500;
+        Sim.FigHeight = scrsz(4)-350;
+        Sim.AR = Sim.FigWidth/Sim.FigHeight;
+        if isempty(Sim.IC)
+            [Sim.COMx0,Sim.COMy0] = Sim.Mod.GetPos(zeros(1,Sim.Mod.stDim),'COM');
         else
-            [sim.COMx0,sim.COMy0] = sim.Mod.GetPos(sim.IC(sim.ModCo),'COM');
+            [Sim.COMx0,Sim.COMy0] = Sim.Mod.GetPos(Sim.IC(Sim.ModCo),'COM');
         end
         
         % Init world size params
-        sim.FlMin = -0.2;
-        sim.FlMax = 0.2;
-        %sim.HeightMin = sim.COMy0-6/sim.AR*sim.Mod.l1;
-        %sim.HeightMax = sim.COMy0+4/sim.AR*sim.Mod.l1;
+        Sim.FlMin = -0.2;
+        Sim.FlMax = 0.2;
+        %Sim.HeightMin = Sim.COMy0-6/Sim.AR*Sim.Mod.l1;
+        %Sim.HeightMax = Sim.COMy0+4/Sim.AR*Sim.Mod.l1;
 
     end
     
     
     % init model:
-    sim.Mod.Torque = 0;
-    sim.Mod.x0 = 0;
-    sim.Mod.y0 = 0;   
+    Sim.Mod.Torque = 0;
+    Sim.Mod.x0 = 0;
+    Sim.Mod.y0 = 0;   
     
     % init stats:
-    sim.StepsTaken = 0;
-    sim.ICstore = zeros(sim.stDim, sim.nICsStored);
-    sim.stepsSS = zeros(1,sim.nICsStored-1);
+    Sim.StepsTaken = 0;
+    Sim.ICstore = zeros(Sim.stDim, Sim.nICsStored);
+    Sim.stepsSS = zeros(1,Sim.nICsStored-1);
     
-    % Init sim.End result
-    sim.Out.Torque = [];
-    sim.Out.PoincareSection = [];
-    sim.Out.Torque_time = [];
-    sim.Out.Type = 0;
-    sim.Out.Text = 'Reached end of tspan';
+    % init some controller params:
+    Sim.Con.InitialPotentialNrg = Sim.Mod.GetNrg(Sim.IC,'potential');
+    
+    % Init Sim.End result
+    Sim.Out.Torque = [];
+    Sim.Out.Ep = [];
+    Sim.Out.Ek = [];
+    Sim.Out.Etot = [];
+    Sim.Out.PoincareSection = [];
+    Sim.Out.out_time = [];
+    Sim.Out.Type = Sim.EndFlag_EndOfTime;
+    Sim.Out.Text = 'Reached end of tspan';
     
 end
 

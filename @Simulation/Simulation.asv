@@ -1,12 +1,5 @@
 classdef Simulation < handle & matlab.mixin.Copyable
     
-   properties(Constant)
- 
-        % End flags: 
-        EndFlag_EndOfTime = 0;
-        EndFlag_GoalHeightReached = 0;
- 
-    end
     properties
         Mod; % Model
         Con; % Controller
@@ -26,7 +19,7 @@ classdef Simulation < handle & matlab.mixin.Copyable
         % Performance tracking / Statistics
         Out; % output holder
         EndCond = 0;
-        % Set EndCond to run the Sim until:
+        % Set EndCond to run the sim until:
         % 0 - the end of time
         % [1,numsteps] - numsteps are taken on end_slope
         % 2 - the system converges to a limit cycle
@@ -68,24 +61,24 @@ classdef Simulation < handle & matlab.mixin.Copyable
     
     methods
         % Class constructor:
-        function Sim = Simulation(varargin)
+        function sim = Simulation(varargin)
 
-                    Sim.Mod = Model();
-                    Sim.Con = Controller();
-                    Sim.Env = Terrain();
+                    sim.Mod = Model();
+                    sim.Con = Controller();
+                    sim.Env = Terrain();
            
         end
         
         % Make a deep copy of a handle object.
-        function SimDC = deepcopy(Sim)
+        function SimDC = deepcopy(sim)
             % Instantiate new object of the same class.
-            SimDC = copy(Sim);
-            SimDC.Mod = copy(Sim.Mod);
-            SimDC.Con = copy(Sim.Con);
-            SimDC.Env = copy(Sim.Env);
+            SimDC = copy(sim);
+            SimDC.Mod = copy(sim.Mod);
+            SimDC.Con = copy(sim.Con);
+            SimDC.Env = copy(sim.Env);
         end
         
-        function Sim = SetEndCond(Sim, value)
+        function sim = SetEndCond(sim, value)
             L = length(value);
             if L<1
                 error('Invalid input for EndCond');
@@ -94,7 +87,7 @@ classdef Simulation < handle & matlab.mixin.Copyable
             if value(1) == 1
                 Error = ['When setting EndCond to 1,',...
                            'a value for num. steps is also needed',...
-                           '\nPlease use Sim.EndCond = [1,nsteps]'];
+                           '\nPlease use sim.EndCond = [1,nsteps]'];
                 if L<2
                     error(Error);
                 else
@@ -104,74 +97,71 @@ classdef Simulation < handle & matlab.mixin.Copyable
                 end
             end
             
-            Sim.EndCond = value;
+            sim.EndCond = value;
         end
         
-        function Sim = SetTime(Sim,tstart,tstep,tend)
+        function sim = SetTime(sim,tstart,tstep,tend)
             if nargin~=4
                 error(['Set time expects 3 input arguments',...
                     ' but was provided with ',num2str(nargin)]);
             end
-            Sim.tstart = tstart;
-            Sim.tstep_normal = tstep;
-         %   Sim.tstep_small = tstep/3;
-            Sim.tstep = tstep;
+            sim.tstart = tstart;
+            sim.tstep_normal = tstep;
+         %   sim.tstep_small = tstep/3;
+            sim.tstep = tstep;
             if isnumeric(tend)
                 if tend<=tstart+tstep
                     error('tend is too close to tstart');
                 else
-                    Sim.tend = tend;
+                    sim.tend = tend;
                 end
-                Sim.infTime = 0;
+                sim.infTime = 0;
             else
                 if strcmp(tend,'inf')
                     % Simulation will run for indefinite time
-                    Sim.infTime = 1;
-                    Sim.tend = 10;
+                    sim.infTime = 1;
+                    sim.tend = 10;
                 end
             end
-            Sim.Out.Tend = Sim.tend;
+            sim.Out.Tend = sim.tend;
         end
         
-        function [Xt] = Derivative(Sim,t,X)
+        function [Xt] = Derivative(sim,t,X)
             
-            Xt = [Sim.Mod.Derivative(t,X(Sim.ModCo));
-                  Sim.Con.Derivative(t,X(Sim.ConCo))];
+            Xt = [sim.Mod.Derivative(t,X(sim.ModCo));
+                  sim.Con.Derivative(t,X(sim.ConCo))];
         end
 
-        function [value, isterminal, direction] = Events(Sim, t, X) 
+        function [value, isterminal, direction] = Events(sim, t, X) 
             
-            value = zeros(Sim.nEvents,1);
-            isterminal = ones(Sim.nEvents,1);
-            direction = zeros(Sim.nEvents,1);
+            value = zeros(sim.nEvents,1);
+            isterminal = ones(sim.nEvents,1);
+            direction = zeros(sim.nEvents,1);
 
             % Call model event function
-            [value(Sim.ModEv), isterminal(Sim.ModEv), direction(Sim.ModEv)] = ...
-                Sim.Mod.Events(t,X(Sim.ModCo), Sim.Env);
+            [value(sim.ModEv), isterminal(sim.ModEv), direction(sim.ModEv)] = ...
+                sim.Mod.Events(t,X(sim.ModCo), sim.Env);
             
             % Call controller event function
-            [value(Sim.ConEv), isterminal(Sim.ConEv), direction(Sim.ConEv)] = ...
-                Sim.Con.Events(t,X(Sim.ConCo));
+            [value(sim.ConEv), isterminal(sim.ConEv), direction(sim.ConEv)] = ...
+                sim.Con.Events(t,X(sim.ConCo));
             
 
         end
         
-        function [status] = Output_function(Sim,t,X,flag) 
+        function [status] = Output_function(sim,t,X,flag) 
            
            switch flag
                
                case 'init'
                   
                   % get controler action - first time:
-                  Sim.Mod.Torque = Sim.Con.Get_Torque(Sim.IC,Sim.Mod,t(1)); 
+                  sim.Mod.Torque = sim.Con.Get_Torque(sim.IC,sim.Mod,t(1)); 
                   
                   % save for out:
-                  Sim.Out.Torque = [Sim.Out.Torque ; Sim.Mod.Torque];
-                  Sim.Out.out_time  = [Sim.Out.out_time  t(1)];
-                                    
-                  Sim.Out.Ep = [Sim.Out.Ep ;   Sim.Mod.GetNrg(Sim.IC,'potential')];
-                  Sim.Out.Ek = [Sim.Out.Ek ; Sim.Mod.GetNrg(Sim.IC,'kinetic') ];
-                  Sim.Out.Etot = [Sim.Out.Etot ; Sim.Mod.GetNrg(Sim.IC,'total') ];
+                  sim.Out.Torque = [sim.Out.Torque ; sim.Mod.Torque];
+                  sim.Out.Torque_time  = [sim.Out.Torque_time  t(1)];
+                  
         
                case 'done'
 
@@ -180,45 +170,45 @@ classdef Simulation < handle & matlab.mixin.Copyable
                otherwise
                    
                   % get controler action:
-                  Sim.Mod.Torque = Sim.Con.Get_Torque(X(:,end),Sim.Mod,t(end));
+                  sim.Mod.Torque = sim.Con.Get_Torque(X(:,end),sim.Mod,t(end));
                   
                   % save for out:
-                  Sim.Out.Torque = [Sim.Out.Torque ; Sim.Mod.Torque];
-                  Sim.Out.out_time  = [Sim.Out.out_time  t(end)];
+                  sim.Out.Torque = [sim.Out.Torque ; sim.Mod.Torque];
+                  sim.Out.Torque_time  = [sim.Out.Torque_time  t(end)];
                   
-                  Sim.Out.Ep = [Sim.Out.Ep ;   Sim.Mod.GetNrg(X(:,end),'potential')];
-                  Sim.Out.Ek = [Sim.Out.Ek ; Sim.Mod.GetNrg(X(:,end),'kinetic') ];
-                  Sim.Out.Etot = [Sim.Out.Etot ; Sim.Mod.GetNrg(X(:,end),'total') ];
+                  sim.Out.Ep = sim.mod.GetNrg(X(:,end),'potential');
+                  sim.Out.Ek = sim.mod.GetNrg(X(:,end),'potential');
+                  sim.Out.Etot = sim.mod.GetNrg(X(:,end),'potential');
                   
            end
            
-           if Sim.Graphics == 1
-             Sim.Render(t,X,flag);
+           if sim.Graphics == 1
+             sim.Render(t,X,flag);
            end
            
-           status = Sim.StopSim; 
+           status = sim.StopSim; 
             
         end
 
-        function StopButtonCb(Sim, hObject, eventdata, handles) %#ok<INUSD>
-            if Sim.StopSim == 0
-                Sim.StopSim = 1;
-                Sim.Out.Type = -1;
-                Sim.Out.Text = 'Simulation stopped by user';
+        function StopButtonCb(sim, hObject, eventdata, handles) %#ok<INUSD>
+            if sim.StopSim == 0
+                sim.StopSim = 1;
+                sim.Out.Type = -1;
+                sim.Out.Text = 'Simulation stopped by user';
                 set(hObject,'String','Close Window');
             else
-                close(Sim.Fig)
+                close(sim.Fig)
             end
         end  
         
       
         
-        function out = JoinOuts(Sim,ext_out,last_i)
+        function out = JoinOuts(sim,ext_out,last_i)
             if nargin<3
-                last_i = length(Sim.Out.T);
+                last_i = length(sim.Out.T);
             end
             
-            out = Sim.Out;
+            out = sim.Out;
             if isempty(ext_out) || length(ext_out.T)<1
                 out.X = out.X(1:last_i,:);
                 out.T = out.T(1:last_i,:);
