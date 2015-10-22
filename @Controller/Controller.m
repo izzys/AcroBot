@@ -12,8 +12,8 @@ classdef Controller < handle & matlab.mixin.Copyable
         
         % HC (Heuristic control) parameters:
         InitialPotentialNrg;
-        alpha = pi/4;
-        Kp = 2;
+        alpha = pi/2;
+        Kp = 1;
         Kd = 0;
         
 
@@ -135,6 +135,7 @@ classdef Controller < handle & matlab.mixin.Copyable
 
                case 'HC'
                    
+                   dq1 = X(2);
                    q2 = X(3);
                    dq2 = X(4);
                    q2_desired = X(5);
@@ -147,8 +148,9 @@ classdef Controller < handle & matlab.mixin.Copyable
                    
                    HeightFactor = 1;%0.7*(1+Efactor);
                    
-                   T = -Con.Kp*e/HeightFactor-Con.Kd*de;
- 
+                 %  T = -Con.Kp*e/HeightFactor-Con.Kd*de;
+                   
+                     T = -sign(dq1);
                otherwise
                   
                     return;
