@@ -13,7 +13,7 @@ classdef Controller < handle & matlab.mixin.Copyable
         % HC (Heuristic control) parameters:
         InitialPotentialNrg;
         alpha = pi/7;
-        h = 0.7;
+        h = 0.8;
         Kp = 5;
         Kd = 0;
         ControlON;
@@ -129,7 +129,7 @@ classdef Controller < handle & matlab.mixin.Copyable
                      
                 case 4
                     
-                  Con.ControlON = 0;
+           %        Con.ControlON = 0;
                     
                 otherwise
                   

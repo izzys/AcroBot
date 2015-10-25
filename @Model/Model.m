@@ -3,7 +3,7 @@ classdef Model < handle & matlab.mixin.Copyable
     properties
         
         stDim = 4; % state dimension
-        nEvents = 2; % num. of simulation events
+        nEvents = 4; % num. of simulation events
         IC;
         
         % System parameters:
@@ -21,6 +21,7 @@ classdef Model < handle & matlab.mixin.Copyable
         % Control:
         Torque = 0;
         GoalHeight = 1;
+        theta2_desired;
         
         % Render parameters:
         joint_radius = 0.08;
@@ -237,7 +238,7 @@ classdef Model < handle & matlab.mixin.Copyable
         function [value, isterminal, direction] = Events(Mod, t,q, Floor)
             
             value = ones(Mod.nEvents,1);
-            isterminal = ones(Mod.nEvents,1);
+            isterminal = zeros(Mod.nEvents,1);
             direction = ones(Mod.nEvents,1);
             
             % Event #1 - end point is above goal height:
@@ -247,12 +248,25 @@ classdef Model < handle & matlab.mixin.Copyable
             isterminal(1) = 1;
             direction(1) = 0;
             
-            % Event #2 - dq1 = 0:
-            dq1 = q(2);
+            % Event #2 - dq1 = 0: (from positive side)
                     
-            value(2) = dq1;
+            value(2) = q(2);
             isterminal(2) = 1;
-            direction(2) =  0;
+            direction(2) =  -1;
+            
+            % Event #3 - dq1 = 0: (from negative side)
+                    
+            value(3) = q(2);
+            isterminal(3) = 1;
+            direction(3) =  1;
+            
+            % Event #4 - q2-q2d = 0:
+            q2 = q(3);
+            q2d = Mod.theta2_desired;
+                        
+            value(4) = q2-q2d;
+            isterminal(4) = 1;
+            direction(4) =  0;      
             
             
         end

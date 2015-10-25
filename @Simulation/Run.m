@@ -31,18 +31,32 @@ function [ Sim ] = Run( Sim )
             ModEvID = find(IE(ev) == Sim.ModEv,1,'first');
             if ~isempty(ModEvID)
                 
-                if ModEvID==1
-                    Sim.StopSim = 1;
-                    Sim.Out.Type = Sim.EndFlag_GoalHeightReached;
-                    Sim.Out.Text = 'Reached goal height';
-                end
-                
                 [Sim.Mod,Xa(Sim.ModCo)] = ...
                     Sim.Mod.HandleEvent(ModEvID, XTemp(end,Sim.ModCo),TTemp(end));
                 
                 % Call controller for model events:
                 [Sim.Con,Xa(Sim.ConCo)] =  ...
                     Sim.Con.HandleExtEvent(ModEvID, XTemp(end,:),TTemp(end));
+                
+                if ModEvID==1
+                    Sim.StopSim = 1;
+                    Sim.Out.Type = Sim.EndFlag_GoalHeightReached;
+                    Sim.Out.Text = 'Reached goal height';
+                end
+                
+                if ModEvID==2  %dq1 = 0: (from positive)
+                  %  disp(['dq1=0 from pos. : Torque on.  TimeStamp: ' num2str(TTemp(end))])
+                    Sim.Mod.theta2_desired = Xa(Sim.ConCo);
+                end 
+                
+                if ModEvID==3  %dq1 = 0: (from negative)
+                 %   disp(['dq1=0 from neg. : Torque on.  TimeStamp: ' num2str(TTemp(end))])
+                    Sim.Mod.theta2_desired = Xa(Sim.ConCo);
+                end 
+                
+                if ModEvID==4 %q2-q2d = 0:
+               %     disp(['q2 = q2d: Torque off.  TimeStamp: ' num2str(TTemp(end))])
+                end
  
             end
 

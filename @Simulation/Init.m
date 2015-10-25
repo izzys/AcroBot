@@ -51,6 +51,7 @@ function [ Sim ] = Init( Sim )
     
     % init model:
     Sim.Mod.Torque = 0;
+    Sim.Mod.theta2_desired = Sim.Con.IC;
     Sim.Mod.x0 = 0;
     Sim.Mod.y0 = 0;   
     
